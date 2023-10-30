@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 import motor.motor_asyncio
 
 logging.basicConfig(level=logging.INFO)
@@ -43,6 +43,44 @@ async def aggregate(dt_from, dt_upto, group_type):
     async for doc in collection.aggregate(pipeline):
         result.append(doc)
 
-    dataset = [data["sum"] for data in result]
-    labels = [label["_id"] for label in result]
+    dates = []
+
+    if group_type == 'hour':
+        curr_date = dt_from
+        while curr_date <= dt_upto:
+            dates.append(curr_date)
+            curr_date += timedelta(hours=1)
+    
+    elif group_type == 'day':
+        curr_date = dt_from
+        while curr_date <= dt_upto:
+            dates.append(curr_date)
+            curr_date += timedelta(days=1)
+    
+    elif group_type == 'month':
+        curr_date = dt_from
+        while curr_date <= dt_upto:
+            dates.append(curr_date)
+            if curr_date.month == 12:
+                curr_date = curr_date.replace(year=curr_date.year + 1, month=1)
+            else:
+                curr_date = curr_date.replace(month=curr_date.month + 1)
+
+    dataset = []
+    labels = []
+
+    for date in dates:
+        format_date = date.strftime(groups[group_type])
+        found = False
+        
+        for doc in result:
+            if doc['_id'] == format_date:
+                dataset.append(doc['sum'])
+                labels.append(doc['_id'])
+                found = True
+                break
+        if not found:
+            dataset.append(0)
+            labels.append(format_date)
+
     return {"dataset": dataset, "labels": labels}
