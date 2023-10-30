@@ -10,6 +10,7 @@ groups = {
     "month": "%Y-%m-01T00:00:00"
 }
 
+#я использую облачную бд чтобы не пришлось кидать на гитхаб файл с датасетом, надеюсь так можно
 async def aggregate(dt_from, dt_upto, group_type):
     cluster = motor.motor_asyncio.AsyncIOMotorClient('mongodb+srv://sancho:parol123@cluster0.djrx8ct.mongodb.net/?retryWrites=true&w=majority')
     collection = cluster.testtaskdb.samplecol
