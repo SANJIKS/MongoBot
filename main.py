@@ -6,8 +6,8 @@ logging.basicConfig(level=logging.INFO)
 
 groups = {
     "hour": "%Y-%m-%dT%H:00:00",
-    "day": "%Y-%m-%d",
-    "month": "%Y-%m-01"
+    "day": "%Y-%m-%dT00:00:00",
+    "month": "%Y-%m-01T00:00:00"
 }
 
 async def aggregate(dt_from, dt_upto, group_type):
